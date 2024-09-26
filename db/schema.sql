@@ -237,8 +237,8 @@ CREATE TABLE infrastruktur.prasarana_mcc (
     deskripsi_prasarana character varying(255) NOT NULL,
     gambar_prasarana character varying(255) NOT NULL,
     kapasitas_prasarana character varying(255) NOT NULL,
-    biaya_sewa character varying(255) NOT NULL,
-    ukuran_prasarana character varying(255) NOT NULL
+    biaya_sewa character varying(255) DEFAULT 'Gratis'::character varying NOT NULL,
+    ukuran_prasarana character varying(255)
 );
 
 
