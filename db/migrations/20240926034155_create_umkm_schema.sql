@@ -24,6 +24,7 @@ CREATE TABLE "umkm"."produk"(
   "foto_produk"          VARCHAR(255) 	NOT NULL ,
   "umkm_id"          uuid 	NOT NULL ,
   "link_produk_marketplace" TEXT NULL ,
+  "approved" BOOLEAN DEFAULT FALSE NOT NULL,
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),
