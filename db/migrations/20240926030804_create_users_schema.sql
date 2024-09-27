@@ -14,7 +14,9 @@ CREATE TABLE "user"."role"(
 CREATE INDEX "pkey_urole" ON "user"."role" ("id");
 
 -- insert role data
-INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4d', 'admin');
+INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4d', 'admin_pengelola');
+INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4c', 'admin_fo');
+INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4a', 'admin');
 INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4e', 'personal');
 INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4f', 'instansi');
 
