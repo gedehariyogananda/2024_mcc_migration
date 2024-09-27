@@ -1,7 +1,6 @@
 -- migrate:up
 CREATE SCHEMA IF NOT EXISTS "interaction";
 
--- create table interaction.follow user personal and user instansi
 DROP TABLE IF EXISTS "interaction"."follow" CASCADE;
 CREATE TABLE "interaction"."follow"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
@@ -16,4 +15,6 @@ CREATE TABLE "interaction"."follow"(
 );
 
 -- migrate:down
+DROP SCHEMA IF EXISTS "interaction" CASCADE;
+DROP TABLE IF EXISTS "interaction"."follow" CASCADE;
 
