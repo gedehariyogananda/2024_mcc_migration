@@ -24,6 +24,13 @@ CREATE SCHEMA infrastruktur;
 
 
 --
+-- Name: interaction; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA interaction;
+
+
+--
 -- Name: master; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -255,12 +262,28 @@ CREATE TABLE infrastruktur.sarana_mcc (
 
 
 --
+-- Name: follow; Type: TABLE; Schema: interaction; Owner: -
+--
+
+CREATE TABLE interaction.follow (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    follower_id uuid NOT NULL,
+    following_id uuid NOT NULL,
+    status_follow boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: ekraf; Type: TABLE; Schema: master; Owner: -
 --
 
 CREATE TABLE master.ekraf (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    name character varying(50) NOT NULL
+    nama character varying(50) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -270,7 +293,9 @@ CREATE TABLE master.ekraf (
 
 CREATE TABLE master.kategori (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    name character varying(50) NOT NULL
+    nama character varying(50) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -282,7 +307,9 @@ CREATE TABLE master.mcc_posisi (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     latitude numeric(10,7) NOT NULL,
     longitude numeric(10,7) NOT NULL,
-    radius integer NOT NULL
+    radius integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -293,7 +320,9 @@ CREATE TABLE master.mcc_posisi (
 CREATE TABLE master.waktu_booking (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     waktu_mulai character varying(255) NOT NULL,
-    waktu_selesai character varying(255) NOT NULL
+    waktu_selesai character varying(255) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -367,6 +396,7 @@ CREATE TABLE umkm.produk (
     foto_produk character varying(255) NOT NULL,
     umkm_id uuid NOT NULL,
     link_produk_marketplace text,
+    approved boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -411,6 +441,11 @@ CREATE TABLE "user".account (
     youtube character varying(255),
     tiktok character varying(255),
     is_umkm boolean DEFAULT false NOT NULL,
+    is_verified_user boolean DEFAULT false NOT NULL,
+    code_verifikasi_register character varying(255),
+    code_verifikasi_forgot_password character varying(255),
+    expired_code_register timestamp without time zone,
+    expired_code_forgot_password timestamp without time zone,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -437,6 +472,7 @@ CREATE TABLE "user".api_tokens (
 
 CREATE TABLE "user".role (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    code character varying(255) NOT NULL,
     name character varying(50) NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -505,6 +541,14 @@ ALTER TABLE ONLY infrastruktur.prasarana_mcc
 
 ALTER TABLE ONLY infrastruktur.sarana_mcc
     ADD CONSTRAINT sarana_mcc_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: follow follow_pkey; Type: CONSTRAINT; Schema: interaction; Owner: -
+--
+
+ALTER TABLE ONLY interaction.follow
+    ADD CONSTRAINT follow_pkey PRIMARY KEY (id);
 
 
 --
@@ -877,6 +921,22 @@ ALTER TABLE ONLY infrastruktur.sarana_mcc
 
 
 --
+-- Name: follow follow_follower_id_fkey; Type: FK CONSTRAINT; Schema: interaction; Owner: -
+--
+
+ALTER TABLE ONLY interaction.follow
+    ADD CONSTRAINT follow_follower_id_fkey FOREIGN KEY (follower_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: follow follow_following_id_fkey; Type: FK CONSTRAINT; Schema: interaction; Owner: -
+--
+
+ALTER TABLE ONLY interaction.follow
+    ADD CONSTRAINT follow_following_id_fkey FOREIGN KEY (following_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: sub_responden sub_responden_responden_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
 --
 
@@ -956,4 +1016,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20240926035654'),
     ('20240926041443'),
     ('20240926050516'),
-    ('20240926051302');
+    ('20240926051302'),
+    ('20240927121511');

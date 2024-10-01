@@ -6,34 +6,38 @@ CREATE SCHEMA IF NOT EXISTS "master";
 DROP TABLE IF EXISTS "master"."kategori" CASCADE;
 CREATE TABLE "master"."kategori"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
-  "name"          VARCHAR(50) 	NOT NULL ,
+  "nama"          VARCHAR(50) 	NOT NULL ,
+    "created_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  "updated_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id")
 );
 
 CREATE INDEX "pkey_kategori" ON "master"."kategori" ("id");
 
 -- make dumy kategori
-INSERT INTO "master"."kategori" ("name") VALUES ('Pelaku Ekraf');
-INSERT INTO "master"."kategori" ("name") VALUES ('Komunitas & Kolaborasi');
-INSERT INTO "master"."kategori" ("name") VALUES ('Usaha / Bisnis');
-INSERT INTO "master"."kategori" ("name") VALUES ('Lembaga Pendidikan');
-INSERT INTO "master"."kategori" ("name") VALUES ('Media Partner');
-INSERT INTO "master"."kategori" ("name") VALUES ('Market');
-INSERT INTO "master"."kategori" ("name") VALUES ('Agregator');
-INSERT INTO "master"."kategori" ("name") VALUES ('Lembaga Pemerintah');
-INSERT INTO "master"."kategori" ("name") VALUES ('Lembaga Keuangan');
+INSERT INTO "master"."kategori" ("nama") VALUES ('Pelaku Ekraf');
+INSERT INTO "master"."kategori" ("nama") VALUES ('Komunitas & Kolaborasi');
+INSERT INTO "master"."kategori" ("nama") VALUES ('Usaha / Bisnis');
+INSERT INTO "master"."kategori" ("nama") VALUES ('Lembaga Pendidikan');
+INSERT INTO "master"."kategori" ("nama") VALUES ('Media Partner');
+INSERT INTO "master"."kategori" ("nama") VALUES ('Market');
+INSERT INTO "master"."kategori" ("nama") VALUES ('Agregator');
+INSERT INTO "master"."kategori" ("nama") VALUES ('Lembaga Pemerintah');
+INSERT INTO "master"."kategori" ("nama") VALUES ('Lembaga Keuangan');
 
 DROP TABLE IF EXISTS "master"."ekraf" CASCADE;
 CREATE TABLE "master"."ekraf"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
-  "name"          VARCHAR(50) 	NOT NULL ,
+  "nama"          VARCHAR(50) 	NOT NULL ,
+    "created_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  "updated_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id")
 );
 
 CREATE INDEX "pkey_ekraf" ON "master"."ekraf" ("id");
 
 -- make dumy ekraf
-INSERT INTO "master"."ekraf" ("name")
+INSERT INTO "master"."ekraf" ("nama")
 VALUES 
   ('Arsitektur'),
   ('Film'),
@@ -60,6 +64,8 @@ CREATE TABLE "master"."mcc_posisi"(
   "latitude" DECIMAL(10, 7) NOT NULL,
   "longitude" DECIMAL(10, 7) NOT NULL, 
   "radius" INT NOT NULL,  
+    "created_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  "updated_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id")
 );
 
@@ -75,6 +81,8 @@ CREATE TABLE "master"."waktu_booking"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
   "waktu_mulai" VARCHAR(255) NOT NULL,
   "waktu_selesai" VARCHAR(255) NOT NULL,
+    "created_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  "updated_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id")
 );
 

@@ -6,6 +6,7 @@ CREATE SCHEMA IF NOT EXISTS "user";
 DROP TABLE IF EXISTS "user"."role" CASCADE;
 CREATE TABLE "user"."role"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
+  "code" varchar(255) NOT NULL,
   "name"          VARCHAR(50) 	NOT NULL ,
   "created_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
@@ -14,11 +15,11 @@ CREATE TABLE "user"."role"(
 CREATE INDEX "pkey_urole" ON "user"."role" ("id");
 
 -- insert role data
-INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4d', 'admin_pengelola');
-INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4c', 'admin_fo');
-INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4a', 'admin');
-INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4e', 'personal');
-INSERT INTO "user"."role"("id", "name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4f', 'instansi');
+INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4d','AS_ADMIN_PENGELOLA' ,'Admin Pengelola');
+INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4c','A_ADMIN_FO' ,'Admin FO');
+INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4a','A_ADMIN' ,'Admin');
+INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4e','U_PERSONAL' ,'Personal');
+INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4f','U_INSTANSI' ,'Instansi');
 
 
 -- create account table
@@ -36,7 +37,7 @@ CREATE TABLE "user"."account"(
   "jenis_kelamin_personal" VARCHAR(255) NULL,
   "kategori_id" uuid NOT NULL,
   "ekraf_id"   uuid NOT NULL,  
-  "kota_Instansi" VARCHAR(255) NULL,
+  "kota_instansi" VARCHAR(255) NULL,
   "kecamatan_instansi" VARCHAR(255) NULL,
   "deskripsi" VARCHAR(255) NULL,
   "facebook" VARCHAR(255) NULL,
@@ -45,6 +46,11 @@ CREATE TABLE "user"."account"(
   "youtube" VARCHAR(255) NULL,
   "tiktok" VARCHAR(255) NULL,
   "is_umkm" BOOLEAN DEFAULT FALSE NOT NULL,
+  "is_verified_user" BOOLEAN DEFAULT FALSE NOT NULL,
+  "code_verifikasi_register" VARCHAR(255) NULL,
+  "code_verifikasi_forgot_password" VARCHAR(255) NULL,
+  "expired_code_register" TIMESTAMP NULL,
+  "expired_code_forgot_password" TIMESTAMP NULL,
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),
