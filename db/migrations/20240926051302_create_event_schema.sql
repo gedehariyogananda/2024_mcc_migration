@@ -111,8 +111,6 @@ DROP TABLE IF EXISTS "event"."ruang_event" CASCADE;
 
 CREATE TYPE status_persetujuan_ruangan_enum AS ENUM ('PENDING', 'APPROVED','REJECTED');
 
-
-
 CREATE TABLE "event"."ruang_event"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
   "booking_id" uuid NOT NULL,

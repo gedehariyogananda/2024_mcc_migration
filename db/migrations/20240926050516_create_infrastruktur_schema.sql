@@ -32,6 +32,7 @@ CREATE TABLE "infrastruktur"."prasarana_mcc"(
   "gambar_prasarana" VARCHAR(255) NOT NULL,
   "kapasitas_prasarana" VARCHAR(255) NOT NULL,
   "biaya_sewa" VARCHAR(255) NOT NULL DEFAULT 'Gratis',
+  "pic" VARCHAR(255) NULL,
   "ukuran_prasarana" VARCHAR(255) NULL,
   PRIMARY KEY ("id"),
   FOREIGN KEY ("infrastruktur_mcc_id") REFERENCES "infrastruktur"."infrastruktur_mcc"("id")  ON UPDATE CASCADE ON DELETE CASCADE
