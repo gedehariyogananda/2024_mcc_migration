@@ -31,6 +31,13 @@ CREATE SCHEMA interaction;
 
 
 --
+-- Name: log; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA log;
+
+
+--
 -- Name: master; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -97,9 +104,7 @@ CREATE TYPE public.jenis_event_enum AS ENUM (
 CREATE TYPE public.status_persetujuan_enum AS ENUM (
     'BOOKING',
     'APPROVED',
-    'CHECKIN',
-    'APPROVED-CHECKIN',
-    'CHECKOUT',
+    'APPROVED_CHECKIN',
     'APPROVED_CHECKOUT',
     'REJECTED'
 );
@@ -116,16 +121,6 @@ CREATE TYPE public.status_persetujuan_ruangan_enum AS ENUM (
 );
 
 
---
--- Name: status_peserta_enum; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE public.status_peserta_enum AS ENUM (
-    'PANITIA',
-    'PESERTA'
-);
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -137,11 +132,7 @@ SET default_table_access_method = heap;
 CREATE TABLE event.absensi_event (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     booking_id uuid NOT NULL,
-    nama_peserta character varying(255) NOT NULL,
-    asal_peserta character varying(255) NOT NULL,
-    email character varying(255) NOT NULL,
-    no_telp character varying(255) NOT NULL,
-    status_peserta public.status_peserta_enum NOT NULL,
+    account_id uuid NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -171,10 +162,13 @@ CREATE TABLE event.booking (
     no_rek character varying(255),
     pendapatan_total numeric(10,2),
     url_payment_gateway character varying(255),
-    qr_code_absensi character varying(255),
+    qr_code_absensi text,
+    qr_code_checkin text,
+    original_url_absensi text,
+    short_url_absensi character varying(255),
     foto_ruangan_checkout character varying(255),
-    nama_penjaga_fo character varying(255),
-    nama_pengecek_ruangan character varying(255),
+    alasan_reject text,
+    deskripsi_kebutuhan_fo text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -186,7 +180,9 @@ CREATE TABLE event.booking (
 
 CREATE TABLE event.kategori_event (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    nama_kategori character varying(255) NOT NULL
+    nama_kategori character varying(255) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -229,7 +225,9 @@ CREATE TABLE event.ruang_event (
 CREATE TABLE infrastruktur.infrastruktur_mcc (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     nama_infrastruktur character varying(255) NOT NULL,
-    deskripsi_infrastruktur character varying(255) NOT NULL
+    deskripsi_infrastruktur character varying(255) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -245,7 +243,10 @@ CREATE TABLE infrastruktur.prasarana_mcc (
     gambar_prasarana character varying(255) NOT NULL,
     kapasitas_prasarana character varying(255) NOT NULL,
     biaya_sewa character varying(255) DEFAULT 'Gratis'::character varying NOT NULL,
-    ukuran_prasarana character varying(255)
+    pic character varying(255),
+    ukuran_prasarana character varying(255),
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -270,6 +271,19 @@ CREATE TABLE interaction.follow (
     follower_id uuid NOT NULL,
     following_id uuid NOT NULL,
     status_follow boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: log; Type: TABLE; Schema: log; Owner: -
+--
+
+CREATE TABLE log.log (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    admin_log_id uuid NOT NULL,
+    booking_id uuid NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -336,12 +350,101 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: complaintment; Type: TABLE; Schema: responden; Owner: -
+--
+
+CREATE TABLE responden.complaintment (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    nama_lengkap character varying(255) NOT NULL,
+    no_telp character varying(255) NOT NULL,
+    is_pernah_pinjam_mcc boolean NOT NULL,
+    nama_instansi character varying(255) NOT NULL,
+    keluhan text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: feedback_data_diri; Type: TABLE; Schema: responden; Owner: -
+--
+
+CREATE TABLE responden.feedback_data_diri (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    account_id uuid NOT NULL,
+    nama_depan character varying(255) NOT NULL,
+    nama_belakang character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    no_telp character varying(255) NOT NULL,
+    usia integer NOT NULL,
+    frekuensi_kunjungan integer NOT NULL,
+    jenis_kelamin character varying(255) NOT NULL,
+    riwayat_pendidikan character varying(255) NOT NULL,
+    pekerjaan character varying(255) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: feedback_lainnya; Type: TABLE; Schema: responden; Owner: -
+--
+
+CREATE TABLE responden.feedback_lainnya (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    account_id uuid NOT NULL,
+    nama_institusi character varying(255) NOT NULL,
+    no_telp_pic character varying(255) NOT NULL,
+    jumlah_transaksi_event numeric(10,2),
+    jawaban text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: feedback_usul; Type: TABLE; Schema: responden; Owner: -
+--
+
+CREATE TABLE responden.feedback_usul (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    account_id uuid NOT NULL,
+    kolaborasi_perlibatan character varying(255) NOT NULL,
+    penjelasan_kegiatan character varying(255) NOT NULL,
+    keluhan character varying(255) NOT NULL,
+    saran character varying(255) NOT NULL,
+    usul text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: responded; Type: TABLE; Schema: responden; Owner: -
 --
 
 CREATE TABLE responden.responded (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    tipe_responden character varying(255) NOT NULL
+    tipe_responden character varying(255) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: responden_ruangan; Type: TABLE; Schema: responden; Owner: -
+--
+
+CREATE TABLE responden.responden_ruangan (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    account_id uuid NOT NULL,
+    feedback_lainnya_id uuid NOT NULL,
+    booking_id uuid NOT NULL,
+    prasarana_mcc_id uuid NOT NULL,
+    jumlah_peserta integer NOT NULL,
+    jumlah_pengunjung integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -354,7 +457,9 @@ CREATE TABLE responden.sub_responden (
     responden_id uuid NOT NULL,
     pertanyaan character varying(255) NOT NULL,
     nilai_awal character varying(255) DEFAULT '1'::character varying,
-    nilai_akhir character varying(255) DEFAULT '4'::character varying
+    nilai_akhir character varying(255) DEFAULT '4'::character varying,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -364,10 +469,11 @@ CREATE TABLE responden.sub_responden (
 
 CREATE TABLE responden.user_responded (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    responded_id uuid NOT NULL,
-    user_id uuid NOT NULL,
+    sub_responden_id uuid NOT NULL,
+    account_id uuid NOT NULL,
     nilai_responded integer NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -428,12 +534,8 @@ CREATE TABLE "user".account (
     foto character varying(255) NOT NULL,
     nama character varying(255) NOT NULL,
     alamat character varying(255) NOT NULL,
-    website_instansi character varying(255),
     jenis_kelamin_personal character varying(255),
-    kategori_id uuid NOT NULL,
-    ekraf_id uuid NOT NULL,
-    "kota_Instansi" character varying(255),
-    kecamatan_instansi character varying(255),
+    is_ban boolean DEFAULT false NOT NULL,
     deskripsi character varying(255),
     facebook character varying(255),
     instagram character varying(255),
@@ -463,6 +565,34 @@ CREATE TABLE "user".api_tokens (
     token character varying(255) NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     expires_at timestamp without time zone
+);
+
+
+--
+-- Name: instansi_user; Type: TABLE; Schema: user; Owner: -
+--
+
+CREATE TABLE "user".instansi_user (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    account_id uuid NOT NULL,
+    logo_instansi character varying(255),
+    nama_instansi character varying(255) NOT NULL,
+    website_instansi character varying(255),
+    kategori_id uuid NOT NULL,
+    ekraf_id uuid NOT NULL,
+    kota_instansi character varying(255) NOT NULL,
+    kecamatan_instansi character varying(255) NOT NULL,
+    alamat_instansi character varying(255) NOT NULL,
+    deskripsi_instansi character varying(255),
+    email_instansi character varying(255) NOT NULL,
+    pic_instansi character varying(255) NOT NULL,
+    facebook character varying(255),
+    instagram character varying(255),
+    twitter character varying(255),
+    youtube character varying(255),
+    tiktok character varying(255),
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -552,6 +682,14 @@ ALTER TABLE ONLY interaction.follow
 
 
 --
+-- Name: log log_pkey; Type: CONSTRAINT; Schema: log; Owner: -
+--
+
+ALTER TABLE ONLY log.log
+    ADD CONSTRAINT log_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: ekraf ekraf_pkey; Type: CONSTRAINT; Schema: master; Owner: -
 --
 
@@ -592,11 +730,51 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: complaintment complaintment_pkey; Type: CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.complaintment
+    ADD CONSTRAINT complaintment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: feedback_data_diri feedback_data_diri_pkey; Type: CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.feedback_data_diri
+    ADD CONSTRAINT feedback_data_diri_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: feedback_lainnya feedback_lainnya_pkey; Type: CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.feedback_lainnya
+    ADD CONSTRAINT feedback_lainnya_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: feedback_usul feedback_usul_pkey; Type: CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.feedback_usul
+    ADD CONSTRAINT feedback_usul_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: responded responded_pkey; Type: CONSTRAINT; Schema: responden; Owner: -
 --
 
 ALTER TABLE ONLY responden.responded
     ADD CONSTRAINT responded_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: responden_ruangan responden_ruangan_pkey; Type: CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.responden_ruangan
+    ADD CONSTRAINT responden_ruangan_pkey PRIMARY KEY (id);
 
 
 --
@@ -669,6 +847,14 @@ ALTER TABLE ONLY "user".account
 
 ALTER TABLE ONLY "user".api_tokens
     ADD CONSTRAINT api_tokens_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: instansi_user instansi_user_pkey; Type: CONSTRAINT; Schema: user; Owner: -
+--
+
+ALTER TABLE ONLY "user".instansi_user
+    ADD CONSTRAINT instansi_user_pkey PRIMARY KEY (id);
 
 
 --
@@ -764,10 +950,45 @@ CREATE INDEX pkey_waktu_booking ON master.waktu_booking USING btree (id);
 
 
 --
+-- Name: pkey_complaintment; Type: INDEX; Schema: responden; Owner: -
+--
+
+CREATE INDEX pkey_complaintment ON responden.complaintment USING btree (id);
+
+
+--
+-- Name: pkey_feedback_data_diri; Type: INDEX; Schema: responden; Owner: -
+--
+
+CREATE INDEX pkey_feedback_data_diri ON responden.feedback_data_diri USING btree (id);
+
+
+--
+-- Name: pkey_feedback_lainnya; Type: INDEX; Schema: responden; Owner: -
+--
+
+CREATE INDEX pkey_feedback_lainnya ON responden.feedback_lainnya USING btree (id);
+
+
+--
+-- Name: pkey_feedback_usul; Type: INDEX; Schema: responden; Owner: -
+--
+
+CREATE INDEX pkey_feedback_usul ON responden.feedback_usul USING btree (id);
+
+
+--
 -- Name: pkey_responded; Type: INDEX; Schema: responden; Owner: -
 --
 
 CREATE INDEX pkey_responded ON responden.responded USING btree (id);
+
+
+--
+-- Name: pkey_responden_ruangan; Type: INDEX; Schema: responden; Owner: -
+--
+
+CREATE INDEX pkey_responden_ruangan ON responden.responden_ruangan USING btree (id);
 
 
 --
@@ -820,6 +1041,13 @@ CREATE INDEX fkey_uapi_tokens_uaccount ON "user".api_tokens USING btree (user_id
 
 
 --
+-- Name: fkey_uinstansi_user_uaccount; Type: INDEX; Schema: user; Owner: -
+--
+
+CREATE INDEX fkey_uinstansi_user_uaccount ON "user".instansi_user USING btree (account_id);
+
+
+--
 -- Name: pkey_uaccount; Type: INDEX; Schema: user; Owner: -
 --
 
@@ -834,10 +1062,25 @@ CREATE INDEX pkey_uapi_tokens ON "user".api_tokens USING btree (id);
 
 
 --
+-- Name: pkey_uinstansi_user; Type: INDEX; Schema: user; Owner: -
+--
+
+CREATE INDEX pkey_uinstansi_user ON "user".instansi_user USING btree (id);
+
+
+--
 -- Name: pkey_urole; Type: INDEX; Schema: user; Owner: -
 --
 
 CREATE INDEX pkey_urole ON "user".role USING btree (id);
+
+
+--
+-- Name: absensi_event absensi_event_account_id_fkey; Type: FK CONSTRAINT; Schema: event; Owner: -
+--
+
+ALTER TABLE ONLY event.absensi_event
+    ADD CONSTRAINT absensi_event_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -937,6 +1180,78 @@ ALTER TABLE ONLY interaction.follow
 
 
 --
+-- Name: log log_admin_log_id_fkey; Type: FK CONSTRAINT; Schema: log; Owner: -
+--
+
+ALTER TABLE ONLY log.log
+    ADD CONSTRAINT log_admin_log_id_fkey FOREIGN KEY (admin_log_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: log log_booking_id_fkey; Type: FK CONSTRAINT; Schema: log; Owner: -
+--
+
+ALTER TABLE ONLY log.log
+    ADD CONSTRAINT log_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES event.booking(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: feedback_data_diri feedback_data_diri_account_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.feedback_data_diri
+    ADD CONSTRAINT feedback_data_diri_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: feedback_lainnya feedback_lainnya_account_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.feedback_lainnya
+    ADD CONSTRAINT feedback_lainnya_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: feedback_usul feedback_usul_account_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.feedback_usul
+    ADD CONSTRAINT feedback_usul_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: responden_ruangan responden_ruangan_account_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.responden_ruangan
+    ADD CONSTRAINT responden_ruangan_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: responden_ruangan responden_ruangan_booking_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.responden_ruangan
+    ADD CONSTRAINT responden_ruangan_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES event.booking(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: responden_ruangan responden_ruangan_feedback_lainnya_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.responden_ruangan
+    ADD CONSTRAINT responden_ruangan_feedback_lainnya_id_fkey FOREIGN KEY (feedback_lainnya_id) REFERENCES responden.feedback_lainnya(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: responden_ruangan responden_ruangan_prasarana_mcc_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.responden_ruangan
+    ADD CONSTRAINT responden_ruangan_prasarana_mcc_id_fkey FOREIGN KEY (prasarana_mcc_id) REFERENCES infrastruktur.prasarana_mcc(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: sub_responden sub_responden_responden_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
 --
 
@@ -945,11 +1260,19 @@ ALTER TABLE ONLY responden.sub_responden
 
 
 --
--- Name: user_responded user_responded_responded_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+-- Name: user_responded user_responded_account_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
 --
 
 ALTER TABLE ONLY responden.user_responded
-    ADD CONSTRAINT user_responded_responded_id_fkey FOREIGN KEY (responded_id) REFERENCES responden.responded(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT user_responded_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: user_responded user_responded_sub_responden_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.user_responded
+    ADD CONSTRAINT user_responded_sub_responden_id_fkey FOREIGN KEY (sub_responden_id) REFERENCES responden.sub_responden(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -969,22 +1292,6 @@ ALTER TABLE ONLY umkm.produk
 
 
 --
--- Name: account account_ekraf_id_fkey; Type: FK CONSTRAINT; Schema: user; Owner: -
---
-
-ALTER TABLE ONLY "user".account
-    ADD CONSTRAINT account_ekraf_id_fkey FOREIGN KEY (ekraf_id) REFERENCES master.ekraf(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: account account_kategori_id_fkey; Type: FK CONSTRAINT; Schema: user; Owner: -
---
-
-ALTER TABLE ONLY "user".account
-    ADD CONSTRAINT account_kategori_id_fkey FOREIGN KEY (kategori_id) REFERENCES master.kategori(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: account account_urole_id_fkey; Type: FK CONSTRAINT; Schema: user; Owner: -
 --
 
@@ -1001,6 +1308,30 @@ ALTER TABLE ONLY "user".api_tokens
 
 
 --
+-- Name: instansi_user instansi_user_account_id_fkey; Type: FK CONSTRAINT; Schema: user; Owner: -
+--
+
+ALTER TABLE ONLY "user".instansi_user
+    ADD CONSTRAINT instansi_user_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: instansi_user instansi_user_ekraf_id_fkey; Type: FK CONSTRAINT; Schema: user; Owner: -
+--
+
+ALTER TABLE ONLY "user".instansi_user
+    ADD CONSTRAINT instansi_user_ekraf_id_fkey FOREIGN KEY (ekraf_id) REFERENCES master.ekraf(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: instansi_user instansi_user_kategori_id_fkey; Type: FK CONSTRAINT; Schema: user; Owner: -
+--
+
+ALTER TABLE ONLY "user".instansi_user
+    ADD CONSTRAINT instansi_user_kategori_id_fkey FOREIGN KEY (kategori_id) REFERENCES master.kategori(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -1013,8 +1344,9 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20240926022753'),
     ('20240926030804'),
     ('20240926034155'),
-    ('20240926035654'),
     ('20240926041443'),
     ('20240926050516'),
     ('20240926051302'),
-    ('20240927121511');
+    ('20240926051303'),
+    ('20240927121511'),
+    ('20241023062357');

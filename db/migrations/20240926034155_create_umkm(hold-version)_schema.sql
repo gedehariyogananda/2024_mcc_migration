@@ -1,7 +1,7 @@
 -- migrate:up
 CREATE SCHEMA IF NOT EXISTS "umkm";
 
--- create umkm table
+-- umkm modul schema (hold version)
 DROP TABLE IF EXISTS "umkm"."umkm" CASCADE;
 CREATE TABLE "umkm"."umkm"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
@@ -14,7 +14,6 @@ CREATE TABLE "umkm"."umkm"(
 
 CREATE INDEX "pkey_umkm" ON "umkm"."umkm" ("id");
 
--- create produk UMKM
 DROP TABLE IF EXISTS "umkm"."produk" CASCADE;
 CREATE TABLE "umkm"."produk"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,

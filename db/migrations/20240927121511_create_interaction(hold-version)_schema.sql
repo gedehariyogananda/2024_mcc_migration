@@ -1,6 +1,7 @@
 -- migrate:up
 CREATE SCHEMA IF NOT EXISTS "interaction";
 
+-- interaction modul schema (hold version)
 DROP TABLE IF EXISTS "interaction"."follow" CASCADE;
 CREATE TABLE "interaction"."follow"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,

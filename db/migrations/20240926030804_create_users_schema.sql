@@ -1,8 +1,7 @@
 -- migrate:up
--- create user schema
 CREATE SCHEMA IF NOT EXISTS "user";
 
--- create role table
+-- schema user modul 
 DROP TABLE IF EXISTS "user"."role" CASCADE;
 CREATE TABLE "user"."role"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
@@ -14,15 +13,19 @@ CREATE TABLE "user"."role"(
 );
 CREATE INDEX "pkey_urole" ON "user"."role" ("id");
 
--- insert role data
-INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4d','AS_ADMIN_PENGELOLA' ,'Admin Pengelola');
-INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4c','A_ADMIN_FO' ,'Admin FO');
-INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4a','A_ADMIN' ,'Admin');
-INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4e','U_PERSONAL' ,'Personal');
-INSERT INTO "user"."role"("id", "code","name") VALUES ('b7e3f4c2-7d7b-4d9d-9a3d-8e9c8c6b6e4f','U_INSTANSI' ,'Instansi');
+
+-- tier of user role 
+-- AS -> Admin Super
+-- A -> Admin Normal
+-- U -> User 
+
+INSERT INTO "user"."role"("id", "code","name") VALUES ('0795c197-fe7c-5fe3-b708-69fda3a060bf','AS_SUPER_ADMIN' ,'Super Admin');
+INSERT INTO "user"."role"("id", "code","name") VALUES ('078793df-0d81-51ca-9847-b4c34f506260','AS_ADMIN_PENGELOLA' ,'Admin Pengelola');
+INSERT INTO "user"."role"("id", "code","name") VALUES ('abfc0b97-6fa9-4f18-a3bf-815d9af0db4f','A_ADMIN_FO' ,'Admin FO');
+INSERT INTO "user"."role"("id", "code","name") VALUES ('bc8816b7-6ad1-4396-8644-8f087b75cfad','A_ADMIN_MARKETING' ,'Admin Marketing');
+INSERT INTO "user"."role"("id", "code","name") VALUES ('fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577','U_USER' ,'User');
 
 
--- create account table
 DROP TABLE IF EXISTS "user"."account" CASCADE;
 CREATE TABLE "user"."account"(
   "id"                uuid            DEFAULT uuid_generate_v4() ,
@@ -33,12 +36,8 @@ CREATE TABLE "user"."account"(
   "foto"               VARCHAR(255) NOT NULL,
   "nama" VARCHAR(255) NOT NULL,
   "alamat" VARCHAR(255) NOT NULL,
-  "website_instansi" VARCHAR(255) NULL,
   "jenis_kelamin_personal" VARCHAR(255) NULL,
-  "kategori_id" uuid NOT NULL,
-  "ekraf_id"   uuid NOT NULL,  
-  "kota_instansi" VARCHAR(255) NULL,
-  "kecamatan_instansi" VARCHAR(255) NULL,
+  "is_ban" BOOLEAN DEFAULT FALSE NOT NULL,
   "deskripsi" VARCHAR(255) NULL,
   "facebook" VARCHAR(255) NULL,
   "instagram" VARCHAR(255) NULL,
@@ -54,15 +53,45 @@ CREATE TABLE "user"."account"(
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("urole_id") REFERENCES "user"."role"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
-  FOREIGN KEY ("kategori_id") REFERENCES "master"."kategori"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
-  FOREIGN KEY ("ekraf_id") REFERENCES "master"."ekraf"("id")  ON UPDATE CASCADE ON DELETE CASCADE
+  FOREIGN KEY ("urole_id") REFERENCES "user"."role"("id")  ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE INDEX "pkey_uaccount" ON "user"."account" ("id");
 CREATE INDEX "fkey_uaccount_urole" ON "user"."account" ("urole_id");
 
--- create api_tokens table
+DROP TABLE IF EXISTS "user"."instansi_user" CASCADE;
+CREATE TABLE "user"."instansi_user"
+(
+  "id"         uuid          DEFAULT uuid_generate_v4() ,
+  "account_id" uuid          NOT NULL ,
+  "logo_instansi" varchar(255)  NULL ,
+  "nama_instansi" varchar(255)  NOT NULL ,
+  "website_instansi" varchar(255)  NULL ,
+  "kategori_id" uuid          NOT NULL ,
+  "ekraf_id"   uuid          NOT NULL ,
+  "kota_instansi" varchar(255)  NOT NULL ,
+  "kecamatan_instansi" varchar(255)  NOT NULL ,
+  "alamat_instansi" varchar(255)  NOT NULL ,
+  "deskripsi_instansi" varchar(255)  NULL ,
+  "email_instansi" varchar(255)  NOT NULL ,
+  "pic_instansi" varchar(255)  NOT NULL ,
+  "facebook" VARCHAR(255) NULL,
+  "instagram" VARCHAR(255) NULL,
+  "twitter" VARCHAR(255) NULL,
+  "youtube" VARCHAR(255) NULL,
+  "tiktok" VARCHAR(255) NULL,
+  "created_at" timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("account_id") REFERENCES "user"."account" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("kategori_id") REFERENCES "master"."kategori" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("ekraf_id") REFERENCES "master"."ekraf" ("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE INDEX "pkey_uinstansi_user" ON "user"."instansi_user" ("id");
+CREATE INDEX "fkey_uinstansi_user_uaccount" ON "user"."instansi_user" ("account_id");
+
+
 DROP TABLE IF EXISTS "user"."api_tokens" CASCADE;
 CREATE TABLE "user"."api_tokens"
 (
@@ -84,3 +113,4 @@ DROP SCHEMA IF EXISTS "user" CASCADE;
 DROP TABLE IF EXISTS "user"."role" CASCADE;
 DROP TABLE IF EXISTS "user"."account" CASCADE;
 DROP TABLE IF EXISTS "user"."api_tokens" CASCADE;
+DROP TABLE IF EXISTS "user"."instansi_user" CASCADE;

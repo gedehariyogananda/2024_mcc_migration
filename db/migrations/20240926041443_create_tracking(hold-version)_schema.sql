@@ -1,7 +1,7 @@
 -- migrate:up
 CREATE SCHEMA IF NOT EXISTS "tracking";
 
--- create table tracking
+-- tracking manusia2 yang ada di MCC modul schema (hold version)
 DROP TABLE IF EXISTS "tracking"."tracking" CASCADE;
 CREATE TABLE "tracking"."tracking"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,

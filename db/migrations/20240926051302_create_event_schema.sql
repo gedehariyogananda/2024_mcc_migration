@@ -1,18 +1,19 @@
 -- migrate:up
 CREATE SCHEMA IF NOT EXISTS "event";
 
--- create table event.kategori_event
+-- event modul schema
 DROP TABLE IF EXISTS "event"."kategori_event" CASCADE;
 
 CREATE TABLE "event"."kategori_event"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
   "nama_kategori" VARCHAR(255) NOT NULL,
+  "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
+  "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id")
 );
 
 CREATE INDEX "pkey_kategori_event" ON "event"."kategori_event" ("id");
 
--- dumy data kategori_event
 INSERT INTO "event"."kategori_event" ("nama_kategori") VALUES ('DINAS');
 INSERT INTO "event"."kategori_event" ("nama_kategori") VALUES ('KAMPUS');
 INSERT INTO "event"."kategori_event" ("nama_kategori") VALUES ('KOMERSIL');
@@ -20,13 +21,9 @@ INSERT INTO "event"."kategori_event" ("nama_kategori") VALUES ('KOMUNITAS');
 INSERT INTO "event"."kategori_event" ("nama_kategori") VALUES ('LAINNYA');
 
 
--- create table event.event
 DROP TABLE IF EXISTS "event"."booking" CASCADE;
-
 CREATE TYPE jenis_event_enum AS ENUM ('Terbatas', 'Umum', 'Internal');
-CREATE TYPE status_persetujuan_enum AS ENUM ('BOOKING', 'APPROVED','CHECKIN','APPROVED-CHECKIN','CHECKOUT','APPROVED_CHECKOUT' ,'REJECTED');
-
-
+CREATE TYPE status_persetujuan_enum AS ENUM ('BOOKING', 'APPROVED','APPROVED_CHECKIN','APPROVED_CHECKOUT' ,'REJECTED');
 CREATE TABLE "event"."booking"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
   "account_id" uuid NOT NULL,
@@ -44,53 +41,50 @@ CREATE TABLE "event"."booking"(
   "banner_event" VARCHAR(255) NULL,
   "status_persetujuan" status_persetujuan_enum NOT NULL DEFAULT 'BOOKING',
 
-   -- COLUMN IF COMERSIL EVENT 
-   "harga_tiket" DECIMAL(10,2) NULL,
-   "no_rek" VARCHAR(255) NULL,
-   "pendapatan_total" DECIMAL(10,2) NULL, -- count dari member_event_comersil 
-   "url_payment_gateway" VARCHAR(255) NULL,
+  -- COLUMN IF COMERSIL EVENT 
+  "harga_tiket" DECIMAL(10,2) NULL,
+  "no_rek" VARCHAR(255) NULL,
+  "pendapatan_total" DECIMAL(10,2) NULL, -- count dari member_event_comersil 
+  "url_payment_gateway" VARCHAR(255) NULL,
 
-   -- AFTER CHECKIN AND CHECKOUT SETUP 
-   "qr_code_absensi" VARCHAR(255) NULL,
-   "foto_ruangan_checkout" VARCHAR(255) NULL,
+  -- AFTER CHECKIN AND CHECKOUT SETUP 
+  "qr_code_absensi" TEXT NULL,
+  "qr_code_checkin" TEXT NULL,
+  "original_url_absensi" TEXT NULL,
+  "short_url_absensi" VARCHAR(255) NULL,
+  "foto_ruangan_checkout" VARCHAR(255) NULL,
 
-   -- KEPERLUAN ADMINISTASI 
-   "nama_penjaga_fo" VARCHAR(255) NULL,
-   "nama_pengecek_ruangan" VARCHAR(255) NULL,
+  -- KEPERLUAN ADMINISTASI DAN MARKETING
+  "alasan_reject" TEXT NULL,
+  "deskripsi_kebutuhan_fo" TEXT NULL,
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),
-    FOREIGN KEY ("account_id") REFERENCES "user"."account"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("kategori_event_id") REFERENCES "event"."kategori_event"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("ekraf_id") REFERENCES "master"."ekraf"("id")  ON UPDATE CASCADE ON DELETE CASCADE
+  FOREIGN KEY ("account_id") REFERENCES "user"."account"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("kategori_event_id") REFERENCES "event"."kategori_event"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("ekraf_id") REFERENCES "master"."ekraf"("id")  ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE INDEX "pkey_booking" ON "event"."booking" ("id");
 
--- CREATE table absensi_event 
-DROP TABLE IF EXISTS "event"."absensi_event" CASCADE;
 
-CREATE TYPE status_peserta_enum AS ENUM ('PANITIA', 'PESERTA');
+DROP TABLE IF EXISTS "event"."absensi_event" CASCADE;
 
 CREATE TABLE "event"."absensi_event"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
   "booking_id" uuid NOT NULL,
-  "nama_peserta" VARCHAR(255) NOT NULL,
-  "asal_peserta" VARCHAR(255) NOT NULL,
-  "email" VARCHAR(255) NOT NULL,
-    "no_telp" VARCHAR(255) NOT NULL,
-  "status_peserta" status_peserta_enum NOT NULL,
+  "account_id" uuid NOT NULL,
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("booking_id") REFERENCES "event"."booking"("id")  ON UPDATE CASCADE ON DELETE CASCADE
+  FOREIGN KEY ("booking_id") REFERENCES "event"."booking"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("account_id") REFERENCES "user"."account"("id")  ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE INDEX "pkey_absensi_event" ON "event"."absensi_event" ("id");
 
--- CREATE table member_event_comersil
+-- hold version
 DROP TABLE IF EXISTS "event"."member_event_comersil" CASCADE;
-
 CREATE TABLE "event"."member_event_comersil"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
   "booking_id" uuid NOT NULL,
@@ -101,16 +95,14 @@ CREATE TABLE "event"."member_event_comersil"(
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),
-    FOREIGN KEY ("booking_id") REFERENCES "event"."booking"("id")  ON UPDATE CASCADE ON DELETE CASCADE
+  FOREIGN KEY ("booking_id") REFERENCES "event"."booking"("id")  ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE INDEX "pkey_member_event_comersil" ON "event"."member_event_comersil" ("id");
 
--- CREATE table ruang_event
+
 DROP TABLE IF EXISTS "event"."ruang_event" CASCADE;
-
 CREATE TYPE status_persetujuan_ruangan_enum AS ENUM ('PENDING', 'APPROVED','REJECTED');
-
 CREATE TABLE "event"."ruang_event"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
   "booking_id" uuid NOT NULL,
@@ -121,9 +113,9 @@ CREATE TABLE "event"."ruang_event"(
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),
-    FOREIGN KEY ("booking_id") REFERENCES "event"."booking"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("prasarana_mcc_id") REFERENCES "infrastruktur"."prasarana_mcc"("id") ,
-    FOREIGN KEY ("waktu_booking_id") REFERENCES "master"."waktu_booking"("id") 
+  FOREIGN KEY ("booking_id") REFERENCES "event"."booking"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("prasarana_mcc_id") REFERENCES "infrastruktur"."prasarana_mcc"("id") ,
+  FOREIGN KEY ("waktu_booking_id") REFERENCES "master"."waktu_booking"("id") 
 );
 
 CREATE INDEX "pkey_ruang_event" ON "event"."ruang_event" ("id");
@@ -136,4 +128,5 @@ DROP TABLE IF EXISTS "event"."booking" CASCADE;
 DROP TABLE IF EXISTS "event"."absensi_event" CASCADE;
 DROP TABLE IF EXISTS "event"."member_event_comersil" CASCADE;
 DROP TABLE IF EXISTS "event"."ruang_event" CASCADE;
+
 
