@@ -23,15 +23,18 @@ INSERT INTO "event"."kategori_event" ("nama_kategori") VALUES ('LAINNYA');
 
 DROP TABLE IF EXISTS "event"."booking" CASCADE;
 CREATE TYPE jenis_event_enum AS ENUM ('Terbatas', 'Umum', 'Internal');
-CREATE TYPE status_persetujuan_enum AS ENUM ('BOOKING', 'APPROVED','APPROVED_CHECKIN','APPROVED_CHECKOUT' ,'REJECTED');
+CREATE TYPE status_persetujuan_enum AS ENUM ('BOOKING', 'APPROVED','APPROVED_CHECKIN','APPROVED_CHECKOUT' ,'REJECTED','LATE');
+
 CREATE TABLE "event"."booking"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
   "account_id" uuid NOT NULL,
+  "account_instansi_personal_id" uuid NULL,
   "nama_event" VARCHAR(255) NOT NULL,
   "kode_booking" VARCHAR(255) NOT NULL, -- code format MCC-2409-SAEX (2409 -> tahun dan bulan booking) (SAEX -> 4 random string)
   "kategori_event_id" uuid NOT NULL,
   "ekraf_id" uuid NOT NULL,
   "deskripsi" VARCHAR(255) NOT NULL,
+  "no_telp_pic" VARCHAR(255) NOT NULL,
   "detail_peralatan" VARCHAR(255) NULL,
   "estimasi_peserta" INTEGER NOT NULL,
   "nama_pic" VARCHAR(255) NOT NULL,
@@ -55,12 +58,13 @@ CREATE TABLE "event"."booking"(
   "foto_ruangan_checkout" VARCHAR(255) NULL,
 
   -- KEPERLUAN ADMINISTASI DAN MARKETING
-  "alasan_reject" TEXT NULL,
+  "alasan_reject" TEXT NULL, -- untuk marketing lk nolak
   "deskripsi_kebutuhan_fo" TEXT NULL,
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),
   FOREIGN KEY ("account_id") REFERENCES "user"."account"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("account_instansi_personal_id") REFERENCES "user"."instansi_user"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY ("kategori_event_id") REFERENCES "event"."kategori_event"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY ("ekraf_id") REFERENCES "master"."ekraf"("id")  ON UPDATE CASCADE ON DELETE CASCADE
 );

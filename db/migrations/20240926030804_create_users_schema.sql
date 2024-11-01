@@ -33,7 +33,7 @@ CREATE TABLE "user"."account"(
   "pwd"               TEXT        		NOT NULL ,
   "email"             VARCHAR(255) 		NOT NULL UNIQUE ,
   "no_telp" VARCHAR(255) NOT NULL UNIQUE ,
-  "foto"               VARCHAR(255) NOT NULL,
+  "foto"               VARCHAR(255) NULL,
   "nama" VARCHAR(255) NOT NULL,
   "alamat" VARCHAR(255) NOT NULL,
   "jenis_kelamin_personal" VARCHAR(255) NULL,

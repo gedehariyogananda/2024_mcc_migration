@@ -1,5 +1,6 @@
 -- migrate:up
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+SET TIME ZONE 'Asia/Jakarta';
 
 CREATE SCHEMA IF NOT EXISTS "master";
 

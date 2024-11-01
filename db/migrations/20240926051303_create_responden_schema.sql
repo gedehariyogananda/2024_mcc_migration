@@ -146,8 +146,8 @@ CREATE TABLE "responden"."responden_ruangan" (
   "id" uuid DEFAULT uuid_generate_v4(),
   "account_id" uuid NOT NULL,
   "feedback_lainnya_id" uuid NOT NULL,
-  "booking_id" uuid NOT NULL,
-  "prasarana_mcc_id" uuid NOT NULL,
+  "booking_id" uuid NULL,
+  "prasarana_mcc_id" uuid NULL,
   "jumlah_peserta" integer NOT NULL,
   "jumlah_pengunjung" integer NOT NULL,
   "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -162,8 +162,13 @@ CREATE TABLE "responden"."responden_ruangan" (
 CREATE INDEX "pkey_responden_ruangan" ON "responden"."responden_ruangan" ("id");
 
 -- complaintment modul schema 
+CREATE TYPE status_complainment_enum AS ENUM ('PENDING', 'ANSWERED','DONE');
 CREATE TABLE "responden"."complaintment"(
   "id"            uuid          DEFAULT uuid_generate_v4(),
+  "account_id" uuid NOT NULL,
+  "admin_id" uuid NULL, -- yang menjawab feedback admin ?
+  "pesan_feedback_admin" TEXT NULL, -- feedback nya admin ke user
+  "status_complainment" status_complainment_enum NOT NULL DEFAULT 'PENDING', -- feedback status dari admin
   "nama_lengkap" varchar(255) NOT NULL,
   "no_telp" varchar(255) NOT NULL,
   "is_pernah_pinjam_mcc" BOOLEAN NOT NULL,
@@ -171,7 +176,9 @@ CREATE TABLE "responden"."complaintment"(
   "keluhan" TEXT NOT NULL,
   "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY ("id")
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("account_id") REFERENCES "user"."account"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("admin_id") REFERENCES "user"."account"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE INDEX "pkey_complaintment" ON "responden"."complaintment" ("id");
