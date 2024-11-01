@@ -98,6 +98,17 @@ CREATE TYPE public.jenis_event_enum AS ENUM (
 
 
 --
+-- Name: status_complainment_enum; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.status_complainment_enum AS ENUM (
+    'PENDING',
+    'ANSWERED',
+    'DONE'
+);
+
+
+--
 -- Name: status_persetujuan_enum; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -106,7 +117,8 @@ CREATE TYPE public.status_persetujuan_enum AS ENUM (
     'APPROVED',
     'APPROVED_CHECKIN',
     'APPROVED_CHECKOUT',
-    'REJECTED'
+    'REJECTED',
+    'LATE'
 );
 
 
@@ -145,11 +157,13 @@ CREATE TABLE event.absensi_event (
 CREATE TABLE event.booking (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     account_id uuid NOT NULL,
+    account_instansi_personal_id uuid,
     nama_event character varying(255) NOT NULL,
     kode_booking character varying(255) NOT NULL,
     kategori_event_id uuid NOT NULL,
     ekraf_id uuid NOT NULL,
     deskripsi character varying(255) NOT NULL,
+    no_telp_pic character varying(255) NOT NULL,
     detail_peralatan character varying(255),
     estimasi_peserta integer NOT NULL,
     nama_pic character varying(255) NOT NULL,
@@ -355,6 +369,10 @@ CREATE TABLE public.schema_migrations (
 
 CREATE TABLE responden.complaintment (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    account_id uuid NOT NULL,
+    admin_id uuid,
+    pesan_feedback_admin text,
+    status_complainment public.status_complainment_enum DEFAULT 'PENDING'::public.status_complainment_enum NOT NULL,
     nama_lengkap character varying(255) NOT NULL,
     no_telp character varying(255) NOT NULL,
     is_pernah_pinjam_mcc boolean NOT NULL,
@@ -439,8 +457,8 @@ CREATE TABLE responden.responden_ruangan (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     account_id uuid NOT NULL,
     feedback_lainnya_id uuid NOT NULL,
-    booking_id uuid NOT NULL,
-    prasarana_mcc_id uuid NOT NULL,
+    booking_id uuid,
+    prasarana_mcc_id uuid,
     jumlah_peserta integer NOT NULL,
     jumlah_pengunjung integer NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -531,7 +549,7 @@ CREATE TABLE "user".account (
     pwd text NOT NULL,
     email character varying(255) NOT NULL,
     no_telp character varying(255) NOT NULL,
-    foto character varying(255) NOT NULL,
+    foto character varying(255),
     nama character varying(255) NOT NULL,
     alamat character varying(255) NOT NULL,
     jenis_kelamin_personal character varying(255),
@@ -1100,6 +1118,14 @@ ALTER TABLE ONLY event.booking
 
 
 --
+-- Name: booking booking_account_instansi_personal_id_fkey; Type: FK CONSTRAINT; Schema: event; Owner: -
+--
+
+ALTER TABLE ONLY event.booking
+    ADD CONSTRAINT booking_account_instansi_personal_id_fkey FOREIGN KEY (account_instansi_personal_id) REFERENCES "user".instansi_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: booking booking_ekraf_id_fkey; Type: FK CONSTRAINT; Schema: event; Owner: -
 --
 
@@ -1193,6 +1219,22 @@ ALTER TABLE ONLY log.log
 
 ALTER TABLE ONLY log.log
     ADD CONSTRAINT log_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES event.booking(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: complaintment complaintment_account_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.complaintment
+    ADD CONSTRAINT complaintment_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: complaintment complaintment_admin_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.complaintment
+    ADD CONSTRAINT complaintment_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
