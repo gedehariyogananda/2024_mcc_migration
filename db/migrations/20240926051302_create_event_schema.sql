@@ -59,6 +59,7 @@ CREATE TABLE "event"."booking"(
 
   -- KEPERLUAN ADMINISTASI DAN MARKETING
   "alasan_reject" TEXT NULL, -- untuk marketing lk nolak
+  "no_konfirmasi_admin_reject" VARCHAR(255) NULL,
   "deskripsi_kebutuhan_fo" TEXT NULL,
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
