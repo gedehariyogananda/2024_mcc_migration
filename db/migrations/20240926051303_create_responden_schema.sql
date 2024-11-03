@@ -73,25 +73,10 @@ INSERT INTO "responden"."sub_responden" ("responden_id", "pertanyaan") VALUES
 ('fc04aa15-ca92-4f5d-b72d-e0f31319ce0e', 'Responsivitas petugas saat melakukan pelayanan secara online'),
 ('fc04aa15-ca92-4f5d-b72d-e0f31319ce0e', 'Kelengkapan informasi yang disediakan pada website MCC');
 
-DROP TABLE IF EXISTS "responden"."user_responded" CASCADE;
-CREATE TABLE "responden"."user_responded"(
-  "id"            uuid          DEFAULT uuid_generate_v4(),
-  "sub_responden_id" uuid NOT NULL,
-  "account_id" uuid NOT NULL,
-  "nilai_responded" INTEGER NOT NULL,
-  "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY ("id"),
-  FOREIGN KEY ("sub_responden_id") REFERENCES "responden"."sub_responden"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-  FOREIGN KEY ("account_id") REFERENCES "user"."account"("id") ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-CREATE INDEX "pkey_user_responded" ON "responden"."user_responded" ("id");
-
 -- feedback data diri (temporary hanya 1 kali saat booking aja tampilnya)
 CREATE TABLE "responden"."feedback_data_diri"(
   "id"            uuid          DEFAULT uuid_generate_v4(),
-  "account_id" uuid NOT NULL,
+  "account_id" uuid NULL,
   "nama_depan" varchar(255) NOT NULL,
   "nama_belakang" varchar(255) NOT NULL,
   "email" varchar(255) NOT NULL,
@@ -109,18 +94,38 @@ CREATE TABLE "responden"."feedback_data_diri"(
 
 CREATE INDEX "pkey_feedback_data_diri" ON "responden"."feedback_data_diri" ("id");
 
+
+DROP TABLE IF EXISTS "responden"."user_responded" CASCADE;
+CREATE TABLE "responden"."user_responded"(
+  "id"            uuid          DEFAULT uuid_generate_v4(),
+  "feeback_data_diri_id" uuid NOT NULL,
+  "sub_responden_id" uuid NOT NULL,
+  "account_id" uuid NULL,
+  "nilai_responded" INTEGER NOT NULL,
+  "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("sub_responden_id") REFERENCES "responden"."sub_responden"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("feeback_data_diri_id") REFERENCES "responden"."feedback_data_diri"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("account_id") REFERENCES "user"."account"("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE INDEX "pkey_user_responded" ON "responden"."user_responded" ("id");
+
 -- feedback usul (temporary hanya 1 kali saat booking aja tampilnya)
 CREATE TABLE "responden"."feedback_usul"(
   "id"            uuid          DEFAULT uuid_generate_v4(),
-  "account_id" uuid NOT NULL,
+  "feedback_data_diri_id" uuid NOT NULL,
+  "account_id" uuid NULL,
   "kolaborasi_perlibatan" varchar(255) NOT NULL,
   "penjelasan_kegiatan" varchar(255) NOT NULL,
   "keluhan" varchar(255) NOT NULL,
   "saran" varchar(255) NOT NULL,
-  "usul" TEXT NOT NULL,
+  "usul" TEXT NULL,
   "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id"),
+  FOREIGN KEY ("feedback_data_diri_id") REFERENCES "responden"."feedback_data_diri"("id") ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY ("account_id") REFERENCES "user"."account"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -129,7 +134,7 @@ CREATE INDEX "pkey_feedback_usul" ON "responden"."feedback_usul" ("id");
 -- feedback lainnya (not temporary)
 CREATE TABLE "responden"."feedback_lainnya"(
   "id"            uuid          DEFAULT uuid_generate_v4(),
-  "account_id" uuid NOT NULL,
+  "account_id" uuid NULL,
   "nama_institusi" varchar(255) NOT NULL,
   "no_telp_pic" varchar(255) NOT NULL,
   "jumlah_transaksi_event" DECIMAL(10,2) NULL,
@@ -144,7 +149,7 @@ CREATE INDEX "pkey_feedback_lainnya" ON "responden"."feedback_lainnya" ("id");
 
 CREATE TABLE "responden"."responden_ruangan" (
   "id" uuid DEFAULT uuid_generate_v4(),
-  "account_id" uuid NOT NULL,
+  "account_id" uuid NULL,
   "feedback_lainnya_id" uuid NOT NULL,
   "booking_id" uuid NULL,
   "prasarana_mcc_id" uuid NULL,
@@ -165,7 +170,7 @@ CREATE INDEX "pkey_responden_ruangan" ON "responden"."responden_ruangan" ("id");
 CREATE TYPE status_complainment_enum AS ENUM ('PENDING', 'ANSWERED','DONE');
 CREATE TABLE "responden"."complaintment"(
   "id"            uuid          DEFAULT uuid_generate_v4(),
-  "account_id" uuid NOT NULL,
+  "account_id" uuid NULL,
   "admin_id" uuid NULL, -- yang menjawab feedback admin ?
   "pesan_feedback_admin" TEXT NULL, -- feedback nya admin ke user
   "status_complainment" status_complainment_enum NOT NULL DEFAULT 'PENDING', -- feedback status dari admin
