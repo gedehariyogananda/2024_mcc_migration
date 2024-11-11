@@ -182,7 +182,9 @@ CREATE TABLE event.booking (
     short_url_absensi character varying(255),
     foto_ruangan_checkout character varying(255),
     alasan_reject text,
+    no_konfirmasi_admin_reject character varying(255),
     deskripsi_kebutuhan_fo text,
+    is_sudah_mengisi_feedback boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -369,7 +371,7 @@ CREATE TABLE public.schema_migrations (
 
 CREATE TABLE responden.complaintment (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    account_id uuid NOT NULL,
+    account_id uuid,
     admin_id uuid,
     pesan_feedback_admin text,
     status_complainment public.status_complainment_enum DEFAULT 'PENDING'::public.status_complainment_enum NOT NULL,
@@ -389,7 +391,7 @@ CREATE TABLE responden.complaintment (
 
 CREATE TABLE responden.feedback_data_diri (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    account_id uuid NOT NULL,
+    account_id uuid,
     nama_depan character varying(255) NOT NULL,
     nama_belakang character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
@@ -410,11 +412,11 @@ CREATE TABLE responden.feedback_data_diri (
 
 CREATE TABLE responden.feedback_lainnya (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    account_id uuid NOT NULL,
+    feedback_data_diri_id uuid NOT NULL,
+    account_id uuid,
     nama_institusi character varying(255) NOT NULL,
     no_telp_pic character varying(255) NOT NULL,
-    jumlah_transaksi_event numeric(10,2),
-    jawaban text NOT NULL,
+    jumlah_transaksi_event character varying(255),
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -426,12 +428,13 @@ CREATE TABLE responden.feedback_lainnya (
 
 CREATE TABLE responden.feedback_usul (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    account_id uuid NOT NULL,
+    feedback_data_diri_id uuid NOT NULL,
+    account_id uuid,
     kolaborasi_perlibatan character varying(255) NOT NULL,
     penjelasan_kegiatan character varying(255) NOT NULL,
     keluhan character varying(255) NOT NULL,
     saran character varying(255) NOT NULL,
-    usul text NOT NULL,
+    usul text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -455,7 +458,7 @@ CREATE TABLE responden.responded (
 
 CREATE TABLE responden.responden_ruangan (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    account_id uuid NOT NULL,
+    account_id uuid,
     feedback_lainnya_id uuid NOT NULL,
     booking_id uuid,
     prasarana_mcc_id uuid,
@@ -487,8 +490,9 @@ CREATE TABLE responden.sub_responden (
 
 CREATE TABLE responden.user_responded (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    feeback_data_diri_id uuid NOT NULL,
     sub_responden_id uuid NOT NULL,
-    account_id uuid NOT NULL,
+    account_id uuid,
     nilai_responded integer NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -1254,11 +1258,27 @@ ALTER TABLE ONLY responden.feedback_lainnya
 
 
 --
+-- Name: feedback_lainnya feedback_lainnya_feedback_data_diri_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.feedback_lainnya
+    ADD CONSTRAINT feedback_lainnya_feedback_data_diri_id_fkey FOREIGN KEY (feedback_data_diri_id) REFERENCES responden.feedback_data_diri(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: feedback_usul feedback_usul_account_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
 --
 
 ALTER TABLE ONLY responden.feedback_usul
     ADD CONSTRAINT feedback_usul_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: feedback_usul feedback_usul_feedback_data_diri_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.feedback_usul
+    ADD CONSTRAINT feedback_usul_feedback_data_diri_id_fkey FOREIGN KEY (feedback_data_diri_id) REFERENCES responden.feedback_data_diri(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1307,6 +1327,14 @@ ALTER TABLE ONLY responden.sub_responden
 
 ALTER TABLE ONLY responden.user_responded
     ADD CONSTRAINT user_responded_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: user_responded user_responded_feeback_data_diri_id_fkey; Type: FK CONSTRAINT; Schema: responden; Owner: -
+--
+
+ALTER TABLE ONLY responden.user_responded
+    ADD CONSTRAINT user_responded_feeback_data_diri_id_fkey FOREIGN KEY (feeback_data_diri_id) REFERENCES responden.feedback_data_diri(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

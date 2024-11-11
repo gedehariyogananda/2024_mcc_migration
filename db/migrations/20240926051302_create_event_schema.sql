@@ -23,7 +23,7 @@ INSERT INTO "event"."kategori_event" ("nama_kategori") VALUES ('LAINNYA');
 
 DROP TABLE IF EXISTS "event"."booking" CASCADE;
 CREATE TYPE jenis_event_enum AS ENUM ('Terbatas', 'Umum', 'Internal');
-CREATE TYPE status_persetujuan_enum AS ENUM ('BOOKING', 'APPROVED','APPROVED_CHECKIN','APPROVED_CHECKOUT' ,'REJECTED','LATE');
+CREATE TYPE status_persetujuan_enum AS ENUM ('BOOKING', 'APPROVED','CHECKIN','APPROVED_CHECKIN','APPROVED_CHECKOUT' ,'REJECTED', 'REJECTED_LATE');
 
 CREATE TABLE "event"."booking"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
@@ -61,6 +61,13 @@ CREATE TABLE "event"."booking"(
   "alasan_reject" TEXT NULL, -- untuk marketing lk nolak
   "no_konfirmasi_admin_reject" VARCHAR(255) NULL,
   "deskripsi_kebutuhan_fo" TEXT NULL,
+  "is_sudah_mengisi_feedback" BOOLEAN DEFAULT FALSE NOT NULL,
+
+  -- JIKA DIASSIGN OLEH ADMIN 
+  "is_attemp_admin" BOOLEAN DEFAULT FALSE NOT NULL,
+
+  -- KEPERLUAN IS LATE V1 
+  "is_late" BOOLEAN DEFAULT FALSE NOT NULL,
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),

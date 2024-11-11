@@ -134,14 +134,15 @@ CREATE INDEX "pkey_feedback_usul" ON "responden"."feedback_usul" ("id");
 -- feedback lainnya (not temporary)
 CREATE TABLE "responden"."feedback_lainnya"(
   "id"            uuid          DEFAULT uuid_generate_v4(),
+  "feedback_data_diri_id" uuid NOT NULL,
   "account_id" uuid NULL,
   "nama_institusi" varchar(255) NOT NULL,
   "no_telp_pic" varchar(255) NOT NULL,
-  "jumlah_transaksi_event" DECIMAL(10,2) NULL,
-  "jawaban" TEXT NOT NULL,
+  "jumlah_transaksi_event" VARCHAR(255) NULL,
   "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id"),
+  FOREIGN KEY ("feedback_data_diri_id") REFERENCES "responden"."feedback_data_diri"("id") ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY ("account_id") REFERENCES "user"."account"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -153,7 +154,7 @@ CREATE TABLE "responden"."responden_ruangan" (
   "feedback_lainnya_id" uuid NOT NULL,
   "booking_id" uuid NULL,
   "prasarana_mcc_id" uuid NULL,
-  "jumlah_peserta" integer NOT NULL,
+  "jumlah_peserta" integer NOT NULL, -- from this
   "jumlah_pengunjung" integer NOT NULL,
   "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
