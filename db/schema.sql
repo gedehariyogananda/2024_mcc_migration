@@ -24,13 +24,6 @@ CREATE SCHEMA infrastruktur;
 
 
 --
--- Name: interaction; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA interaction;
-
-
---
 -- Name: log; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -42,6 +35,13 @@ CREATE SCHEMA log;
 --
 
 CREATE SCHEMA master;
+
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+-- *not* creating schema, since initdb creates it
 
 
 --
@@ -115,21 +115,22 @@ CREATE TYPE public.status_complainment_enum AS ENUM (
 CREATE TYPE public.status_persetujuan_enum AS ENUM (
     'BOOKING',
     'APPROVED',
+    'CHECKIN',
     'APPROVED_CHECKIN',
     'APPROVED_CHECKOUT',
     'REJECTED',
-    'LATE'
+    'TEMPORARY_CHECKOUT',
+    'LATE_APPROVAL'
 );
 
 
 --
--- Name: status_persetujuan_ruangan_enum; Type: TYPE; Schema: public; Owner: -
+-- Name: tipe_event_enum; Type: TYPE; Schema: public; Owner: -
 --
 
-CREATE TYPE public.status_persetujuan_ruangan_enum AS ENUM (
-    'PENDING',
-    'APPROVED',
-    'REJECTED'
+CREATE TYPE public.tipe_event_enum AS ENUM (
+    'KOMERSIL',
+    'NON_KOMERSIL'
 );
 
 
@@ -168,25 +169,22 @@ CREATE TABLE event.booking (
     estimasi_peserta integer NOT NULL,
     nama_pic character varying(255) NOT NULL,
     jenis_event public.jenis_event_enum NOT NULL,
-    ttd character varying(255) NOT NULL,
+    ttd text,
     proposal_event character varying(255),
     banner_event character varying(255),
     status_persetujuan public.status_persetujuan_enum DEFAULT 'BOOKING'::public.status_persetujuan_enum NOT NULL,
-    harga_tiket numeric(10,2),
-    no_rek character varying(255),
-    pendapatan_total numeric(10,2),
-    url_payment_gateway character varying(255),
+    tipe_event public.tipe_event_enum DEFAULT 'NON_KOMERSIL'::public.tipe_event_enum NOT NULL,
     qr_code_absensi text,
     qr_code_checkin text,
-    original_url_absensi text,
-    short_url_absensi character varying(255),
-    foto_ruangan_checkout character varying(255),
     alasan_reject text,
     no_konfirmasi_admin_reject character varying(255),
+    nama_pic_admin_reject character varying(255),
     deskripsi_kebutuhan_fo text,
     is_sudah_mengisi_feedback boolean DEFAULT false NOT NULL,
+    is_attemp_admin boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    confirmed_at timestamp without time zone
 );
 
 
@@ -203,22 +201,6 @@ CREATE TABLE event.kategori_event (
 
 
 --
--- Name: member_event_comersil; Type: TABLE; Schema: event; Owner: -
---
-
-CREATE TABLE event.member_event_comersil (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    booking_id uuid NOT NULL,
-    kode_transaksi character varying(255) NOT NULL,
-    nama_member character varying(255) NOT NULL,
-    jumlah_pembayaran numeric(10,2) NOT NULL,
-    payment_method character varying(255) NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
 -- Name: ruang_event; Type: TABLE; Schema: event; Owner: -
 --
 
@@ -228,7 +210,6 @@ CREATE TABLE event.ruang_event (
     prasarana_mcc_id uuid NOT NULL,
     waktu_booking_id uuid NOT NULL,
     tanggal_penggunaan date NOT NULL,
-    status_persetujuan_ruangan public.status_persetujuan_ruangan_enum DEFAULT 'PENDING'::public.status_persetujuan_ruangan_enum NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -255,38 +236,13 @@ CREATE TABLE infrastruktur.prasarana_mcc (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     infrastruktur_mcc_id uuid NOT NULL,
     nama_prasarana character varying(255) NOT NULL,
-    deskripsi_prasarana character varying(255) NOT NULL,
+    deskripsi_prasarana character varying(255),
     gambar_prasarana character varying(255) NOT NULL,
     kapasitas_prasarana character varying(255) NOT NULL,
     biaya_sewa character varying(255) DEFAULT 'Gratis'::character varying NOT NULL,
     pic character varying(255),
     ukuran_prasarana character varying(255),
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: sarana_mcc; Type: TABLE; Schema: infrastruktur; Owner: -
---
-
-CREATE TABLE infrastruktur.sarana_mcc (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    prasarana_mcc_id uuid NOT NULL,
-    nama_sarana character varying(255) NOT NULL,
-    jumlah_sarana character varying(255)
-);
-
-
---
--- Name: follow; Type: TABLE; Schema: interaction; Owner: -
---
-
-CREATE TABLE interaction.follow (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    follower_id uuid NOT NULL,
-    following_id uuid NOT NULL,
-    status_follow boolean DEFAULT false NOT NULL,
+    fasilitas text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -298,8 +254,10 @@ CREATE TABLE interaction.follow (
 
 CREATE TABLE log.log (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    admin_log_id uuid NOT NULL,
+    account_id uuid NOT NULL,
     booking_id uuid NOT NULL,
+    is_sistem boolean DEFAULT false NOT NULL,
+    aktifitas_log text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -555,7 +513,7 @@ CREATE TABLE "user".account (
     no_telp character varying(255) NOT NULL,
     foto character varying(255),
     nama character varying(255) NOT NULL,
-    alamat character varying(255) NOT NULL,
+    alamat character varying(255),
     jenis_kelamin_personal character varying(255),
     is_ban boolean DEFAULT false NOT NULL,
     deskripsi character varying(255),
@@ -566,6 +524,8 @@ CREATE TABLE "user".account (
     tiktok character varying(255),
     is_umkm boolean DEFAULT false NOT NULL,
     is_verified_user boolean DEFAULT false NOT NULL,
+    status_admin character varying(255),
+    aktifitas_admin timestamp without time zone,
     code_verifikasi_register character varying(255),
     code_verifikasi_forgot_password character varying(255),
     expired_code_register timestamp without time zone,
@@ -656,14 +616,6 @@ ALTER TABLE ONLY event.kategori_event
 
 
 --
--- Name: member_event_comersil member_event_comersil_pkey; Type: CONSTRAINT; Schema: event; Owner: -
---
-
-ALTER TABLE ONLY event.member_event_comersil
-    ADD CONSTRAINT member_event_comersil_pkey PRIMARY KEY (id);
-
-
---
 -- Name: ruang_event ruang_event_pkey; Type: CONSTRAINT; Schema: event; Owner: -
 --
 
@@ -685,22 +637,6 @@ ALTER TABLE ONLY infrastruktur.infrastruktur_mcc
 
 ALTER TABLE ONLY infrastruktur.prasarana_mcc
     ADD CONSTRAINT prasarana_mcc_pkey PRIMARY KEY (id);
-
-
---
--- Name: sarana_mcc sarana_mcc_pkey; Type: CONSTRAINT; Schema: infrastruktur; Owner: -
---
-
-ALTER TABLE ONLY infrastruktur.sarana_mcc
-    ADD CONSTRAINT sarana_mcc_pkey PRIMARY KEY (id);
-
-
---
--- Name: follow follow_pkey; Type: CONSTRAINT; Schema: interaction; Owner: -
---
-
-ALTER TABLE ONLY interaction.follow
-    ADD CONSTRAINT follow_pkey PRIMARY KEY (id);
 
 
 --
@@ -909,13 +845,6 @@ CREATE INDEX pkey_kategori_event ON event.kategori_event USING btree (id);
 
 
 --
--- Name: pkey_member_event_comersil; Type: INDEX; Schema: event; Owner: -
---
-
-CREATE INDEX pkey_member_event_comersil ON event.member_event_comersil USING btree (id);
-
-
---
 -- Name: pkey_ruang_event; Type: INDEX; Schema: event; Owner: -
 --
 
@@ -934,13 +863,6 @@ CREATE INDEX pkey_infrastruktur_mcc ON infrastruktur.infrastruktur_mcc USING btr
 --
 
 CREATE INDEX pkey_prasarana_mcc ON infrastruktur.prasarana_mcc USING btree (id);
-
-
---
--- Name: pkey_sarana_mcc; Type: INDEX; Schema: infrastruktur; Owner: -
---
-
-CREATE INDEX pkey_sarana_mcc ON infrastruktur.sarana_mcc USING btree (id);
 
 
 --
@@ -1146,14 +1068,6 @@ ALTER TABLE ONLY event.booking
 
 
 --
--- Name: member_event_comersil member_event_comersil_booking_id_fkey; Type: FK CONSTRAINT; Schema: event; Owner: -
---
-
-ALTER TABLE ONLY event.member_event_comersil
-    ADD CONSTRAINT member_event_comersil_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES event.booking(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: ruang_event ruang_event_booking_id_fkey; Type: FK CONSTRAINT; Schema: event; Owner: -
 --
 
@@ -1186,35 +1100,11 @@ ALTER TABLE ONLY infrastruktur.prasarana_mcc
 
 
 --
--- Name: sarana_mcc sarana_mcc_prasarana_mcc_id_fkey; Type: FK CONSTRAINT; Schema: infrastruktur; Owner: -
---
-
-ALTER TABLE ONLY infrastruktur.sarana_mcc
-    ADD CONSTRAINT sarana_mcc_prasarana_mcc_id_fkey FOREIGN KEY (prasarana_mcc_id) REFERENCES infrastruktur.prasarana_mcc(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: follow follow_follower_id_fkey; Type: FK CONSTRAINT; Schema: interaction; Owner: -
---
-
-ALTER TABLE ONLY interaction.follow
-    ADD CONSTRAINT follow_follower_id_fkey FOREIGN KEY (follower_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: follow follow_following_id_fkey; Type: FK CONSTRAINT; Schema: interaction; Owner: -
---
-
-ALTER TABLE ONLY interaction.follow
-    ADD CONSTRAINT follow_following_id_fkey FOREIGN KEY (following_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: log log_admin_log_id_fkey; Type: FK CONSTRAINT; Schema: log; Owner: -
+-- Name: log log_account_id_fkey; Type: FK CONSTRAINT; Schema: log; Owner: -
 --
 
 ALTER TABLE ONLY log.log
-    ADD CONSTRAINT log_admin_log_id_fkey FOREIGN KEY (admin_log_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT log_account_id_fkey FOREIGN KEY (account_id) REFERENCES "user".account(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1418,5 +1308,4 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20240926050516'),
     ('20240926051302'),
     ('20240926051303'),
-    ('20240927121511'),
     ('20241023062357');
