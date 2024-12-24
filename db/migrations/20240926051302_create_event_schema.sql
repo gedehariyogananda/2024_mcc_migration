@@ -35,6 +35,7 @@ CREATE TABLE "event"."booking"(
   "nama_event" VARCHAR(255) NOT NULL,
   "kode_booking" VARCHAR(255) NOT NULL, -- code format MCC-2409-SAEX (2409 -> tahun dan bulan booking) (SAEX -> 4 random string)
   "kategori_event_id" uuid NOT NULL,
+  "sdgs_id" uuid NULL,
   "ekraf_id" uuid NOT NULL,
   "deskripsi" VARCHAR(255) NOT NULL,
   "no_telp_pic" VARCHAR(255) NOT NULL,
@@ -61,6 +62,7 @@ CREATE TABLE "event"."booking"(
   "confirmed_at" TIMESTAMP NULL,
   PRIMARY KEY ("id"),
   FOREIGN KEY ("account_id") REFERENCES "user"."account"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("sdgs_id") REFERENCES "master"."sdgs"("id") ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY ("account_instansi_personal_id") REFERENCES "user"."instansi_user"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY ("kategori_event_id") REFERENCES "event"."kategori_event"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY ("ekraf_id") REFERENCES "master"."ekraf"("id")  ON UPDATE CASCADE ON DELETE CASCADE
