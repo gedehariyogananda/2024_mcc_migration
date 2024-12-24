@@ -51,7 +51,8 @@ CREATE TABLE "event"."booking"(
   "qr_code_checkin" TEXT NULL,
   "alasan_reject" TEXT NULL, -- untuk marketing lk nolak
   "no_konfirmasi_admin_reject" VARCHAR(255) NULL,
-  "nama_pic_admin_reject" VARCHAR(255) NULL,
+  "nama_pic_admin" VARCHAR(255) NULL,
+  "deskripsi_admin" VARCHAR(255) NULL,
   "deskripsi_kebutuhan_fo" TEXT NULL,
   "is_sudah_mengisi_feedback" BOOLEAN DEFAULT FALSE NOT NULL, 
   "is_attemp_admin" BOOLEAN DEFAULT FALSE NOT NULL,
@@ -91,7 +92,7 @@ INSERT INTO "event"."booking" ("id", "account_id", "nama_event", "kode_booking",
 ('9b5f74cf-7220-4c98-8d41-7c3e260094a1', 'f7f19610-1a8b-4202-b4fd-7c4266baf01a', 'Event dumy', 'MCC-2409-SCEX', '496a64ff-6c07-419a-8bb0-e4305cf65111', '1b3b6576-7959-43fa-8c4f-41f0f948c5b0', 'Deskripsi Event 3', '1234567806', 200, 'PIC 3', 'Internal', 'APPROVED_CHECKOUT', 'NON_KOMERSIL', FALSE, FALSE, '2024-11-19 12:12:23');
 
 
-DROP TABLE IF EXISTS "event"."absensi_event" CASCADE;
+DROP TABLE IF EXISTS "event"."absensi_event" CASCADE; 
 
 CREATE TABLE "event"."absensi_event"(
   "id"            uuid          DEFAULT uuid_generate_v4() ,
@@ -152,6 +153,23 @@ VALUES
   ('9b5f74cf-7220-4c98-8d41-7c3e260094a1', '2666d818-e2aa-4173-85d8-48a3a1e3df95', 'b49542b0-fc2a-4a30-8e10-3b4dd8b2c3cf', '2024-11-18'),
   ('9b5f74cf-7220-4c98-8d41-7c3e260094a1', '29c4aaed-9654-4a6f-b11e-f20fcfaa3c31', 'b49542b0-fc2a-4a30-8e10-3b4dd8b2c3cf', '2024-11-18'),
   ('9b5f74cf-7220-4c98-8d41-7c3e260094a1', '29c4aaed-9654-4a6f-b11e-f20fcfaa3c31', 'da4733db-5e2b-4dc2-8e10-82ac2abdb21b', '2024-11-18');
+
+
+DROP TABLE IF EXISTS "event"."rekap_fo" CASCADE;
+CREATE TABLE "event"."rekap_fo"(
+  "id"            uuid          DEFAULT uuid_generate_v4() ,
+  "booking_id" uuid NOT NULL,
+  "admin_fo_id" uuid NOT NULL,
+  "rekap_status" TEXT DEFAULT 'checkin', -- checkout rekap
+  "nama_pic" TEXT NOT NULL,
+  "duty_officer" TEXT NOT NULL,
+  "deskripsi" TEXT NULL,
+  "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
+  "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("booking_id") REFERENCES "event"."booking"("id")  ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("admin_fo_id") REFERENCES "user"."account"("id")  ON UPDATE CASCADE ON DELETE CASCADE
+);
 
 -- migrate:down
 DROP SCHEMA IF EXISTS "event" CASCADE;

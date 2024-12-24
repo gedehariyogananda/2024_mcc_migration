@@ -530,6 +530,7 @@ CREATE TABLE "user".account (
     code_verifikasi_forgot_password character varying(255),
     expired_code_register timestamp without time zone,
     expired_code_forgot_password timestamp without time zone,
+    refresh_token character varying(255),
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );

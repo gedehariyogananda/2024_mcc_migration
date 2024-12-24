@@ -104,18 +104,35 @@ CREATE INDEX "pkey_mcc_posisi" ON "master"."mcc_posisi" ("id");
 
 INSERT INTO "master"."mcc_posisi" ("latitude","longitude","radius") VALUES (-7.9408266, 112.6424135, 500);
 
--- DUMY DATA 
+DROP TABLE IF EXISTS "master"."sdgs" CASCADE;
+CREATE TABLE "master"."sdgs"(
+  "id"            uuid          DEFAULT uuid_generate_v4() ,
+  "nama" VARCHAR(255) NOT NULL,
+  "created_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  "updated_at"    TIMESTAMP   	NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  PRIMARY KEY ("id")
+);
 
--- INSERT INTO "master"."kategori" ("id", "nama") VALUES 
--- ('550e8400-e29b-41d4-a716-446655440000', 'Pelaku Ekraf'),
--- ('a74a2511-467b-4a78-8395-408b8b0d7619', 'Komunitas & Kolaborasi'),
--- ('4a8ed3b6-b43e-4af7-b556-7b4c9b0e602a', 'Usaha / Bisnis'),
--- ('19a7d0a9-2c28-49b7-a13f-c4929b769c26', 'Lembaga Pendidikan'),
--- ('f94d5f72-6111-4b47-927a-df68e32956d2', 'Media Partner'),
--- ('0de9879d-e999-4959-8d7a-5b8e9ab0f29d', 'Market'),
--- ('7e43ae9c-989f-4569-8fc3-94abfc9efb55', 'Agregator'),
--- ('3f2a1295-7b3e-4f69-86bb-5a76fb3051cf', 'Lembaga Pemerintah'),
--- ('bcb66048-0be3-464d-9249-7b31a0ed98fa', 'Lembaga Keuangan');
+CREATE INDEX "pkey_sdgs" ON "master"."sdgs" ("id");
+
+INSERT INTO "master"."sdgs" ("nama") VALUES
+('Menghapus Kemiskinan'),
+('Mengakhiri Kelaparan'),
+('Kesehatan yang Baik dan Kesejahteraan'),
+('Pendidikan Bermutu'),
+('Kesetaraan Gender'),
+('Akses Air Bersih dan Sanitasi'),
+('Energi Bersih dan Terjangkau'),
+('Pekerjaan Layak dan Pertumbuhan Ekonomi'),
+('Infrastruktur, Industri, dan Inovasi'),
+('Mengurangi Ketimpangan'),
+('Kota dan Komunitas yang Berkelanjutan'),
+('Konsumsi dan Produksi yang Bertanggung Jawab'),
+('Penanganan Perubahan Iklim'),
+('Menjaga Ekosistem Laut'),
+('Menjaga Ekosistem Darat'),
+('Perdamaian, Keadilan, dan Kelembagaan yang Kuat'),
+('Kemitraan untuk Mencapai Tujuan');
 
 -- migrate:down
 DROP SCHEMA IF EXISTS "master" CASCADE;

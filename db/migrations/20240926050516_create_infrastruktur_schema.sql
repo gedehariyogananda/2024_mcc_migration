@@ -21,7 +21,7 @@ INSERT INTO "infrastruktur"."infrastruktur_mcc" ("id","nama_infrastruktur","desk
 INSERT INTO "infrastruktur"."infrastruktur_mcc" ("id","nama_infrastruktur","deskripsi_infrastruktur") VALUES ('2c68deff-2707-4afb-adbe-91218b802583','Lantai 5','Commerce Floor');
 INSERT INTO "infrastruktur"."infrastruktur_mcc" ("id","nama_infrastruktur","deskripsi_infrastruktur") VALUES ('2e07c6be-642d-45ad-b018-995e0614061f','Lantai 6','Champion Floor');
 INSERT INTO "infrastruktur"."infrastruktur_mcc" ("id","nama_infrastruktur","deskripsi_infrastruktur") VALUES ('5b7b5eba-ad31-4e92-bde7-1d75bb96f981','Lantai 7','Consistent Floor');
-INSERT INTO "infrastruktur"."infrastruktur_mcc" ("id","nama_infrastruktur","deskripsi_infrastruktur") VALUES ('0f293ddb-c359-5797-9117-07a72959f8b3','Lantai 8','Culture Floor');
+INSERT INTO "infrastruktur"."infrastruktur_mcc" ("id","nama_infrastruktur","deskripsi_infrastruktur") VALUES ('695f3b26-b102-4c96-818e-d90bf715372a','Lantai 8','Culture Floor');
 
 
 DROP TABLE IF EXISTS "infrastruktur"."prasarana_mcc" CASCADE;
@@ -30,12 +30,13 @@ CREATE TABLE "infrastruktur"."prasarana_mcc"(
   "infrastruktur_mcc_id" uuid NOT NULL,
   "nama_prasarana" VARCHAR(255) NOT NULL,
   "deskripsi_prasarana" VARCHAR(255) NULL,
-  "gambar_prasarana" VARCHAR(255) NOT NULL,
+  "gambar_prasarana" VARCHAR(255) NULL,
   "kapasitas_prasarana" VARCHAR(255) NOT NULL,
   "biaya_sewa" VARCHAR(255) NOT NULL DEFAULT 'Gratis',
   "pic" VARCHAR(255) NULL,
   "ukuran_prasarana" VARCHAR(255) NULL,
   "fasilitas" TEXT NULL,
+  "status_prasarana" VARCHAR(255) NOT NULL DEFAULT 'active', -- 'inactive'
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),

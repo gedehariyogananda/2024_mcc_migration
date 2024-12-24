@@ -51,6 +51,8 @@ CREATE TABLE "user"."account"(
   "code_verifikasi_forgot_password" VARCHAR(255) NULL,
   "expired_code_register" TIMESTAMP NULL,
   "expired_code_forgot_password" TIMESTAMP NULL,
+  "refresh_token" VARCHAR(255) NULL,
+  "google_id" TEXT NULL,
   "created_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   "updated_at"        TIMESTAMP   		NOT NULL  DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY ("id"),
@@ -211,6 +213,17 @@ CREATE TABLE "user"."api_tokens"
 );
 CREATE INDEX "pkey_uapi_tokens" ON "user"."api_tokens" ("id");
 CREATE INDEX "fkey_uapi_tokens_uaccount" ON "user"."api_tokens" ("user_id");
+
+DROP TABLE IF EXISTS "user"."fcm_token_users" CASCADE;
+CREATE TABLE "user"."fcm_token_users" (
+  "id" uuid DEFAULT uuid_generate_v4(),
+  "account_id" uuid NULL,
+  "fcm_token" varchar(255) NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("account_id") REFERENCES "user"."account"("id") ON UPDATE CASCADE ON DELETE CASCADE
+)
 
 -- migrate:down
 DROP SCHEMA IF EXISTS "user" CASCADE;

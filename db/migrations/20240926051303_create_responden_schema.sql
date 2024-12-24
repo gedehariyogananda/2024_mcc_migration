@@ -138,7 +138,7 @@ CREATE TABLE "responden"."feedback_lainnya"(
   "account_id" uuid NULL,
   "nama_institusi" varchar(255) NOT NULL,
   "no_telp_pic" varchar(255) NOT NULL,
-  "jumlah_transaksi_event" VARCHAR(255) NULL,
+  "jumlah_transaksi_event" DECIMAL(15,0) NOT NULL,
   "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id"),
