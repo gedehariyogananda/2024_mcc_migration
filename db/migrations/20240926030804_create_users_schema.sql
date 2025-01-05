@@ -35,6 +35,7 @@ CREATE TABLE "user"."account"(
   "foto"               VARCHAR(255) NULL,
   "nama" VARCHAR(255) NOT NULL,
   "alamat" VARCHAR(255) NULL,
+  "umur" VARCHAR(255) NULL,
   "jenis_kelamin_personal" VARCHAR(255) NULL,
   "is_ban" BOOLEAN DEFAULT FALSE NOT NULL,
   "deskripsi" VARCHAR(255) NULL,
