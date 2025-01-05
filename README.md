@@ -1,5 +1,5 @@
 ```bash
-DBMate Config :
+DBMate Standalone databases configuration :
 
 1. up database
 npx dbmate -e <nama.env setupdb> up

@@ -99,6 +99,83 @@ INSERT INTO "user"."account" ("id", "urole_id", "pwd", "email", "no_telp", "nama
 ('d974ddc7-f0c3-446a-8d6c-b4ef892591a6', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 'user10@example.com', '1234567814', 'User 10', TRUE,NULL, NULL);
 
 
+-- data from mcc account dumy 
+INSERT INTO "user"."account" (
+    "id",
+    "urole_id",
+    "pwd",
+    "email",
+    "no_telp",
+    "foto",
+    "nama",
+    "alamat",
+    "umur",
+    "jenis_kelamin_personal",
+    "is_ban",
+    "deskripsi",
+    "facebook",
+    "instagram",
+    "twitter",
+    "youtube",
+    "tiktok",
+    "is_verified_user")
+VALUES
+    -- Data pertama
+    ('a1c7b4f3-16a7-4f73-8f8b-4025295d71b8', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'adisaraceno@gmail.com', '0000000001', NULL, 'ukmmalang', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data kedua
+    ('b2d7aeb3-b8f4-4fc3-8b02-cd64f0b3589f', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'pelanusa23@gmail.com', '0000000002', NULL, 'Komunitas Pelanusa', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data ketiga
+    ('c3d8e5b6-8ab2-43e0-9108-f53ac04b6160', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'kreature.info@gmail.com', '0000000003', NULL, 'Kreature Indonesia', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data keempat
+    ('d4e3f7c5-e0d4-4889-8919-28f08d5fa3c3', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'jeconiah.13.91@gmail.com', '0000000004', NULL, 'Mahasiswa Pendidikan Seni Rupa Universitas Negeri Malang', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data kelima
+    ('e5f8d4b7-7f8a-4316-b9c5-87f5a2ab6a55', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'meisantiaji1992@gmail.com', '0000000005', NULL, 'GACO - @gaco_officialan', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data keenam
+    ('f6c7e9d8-8f45-4298-89b3-f24d6ffb741b', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'piuspatrickfc21@gmail.com', '0000000006', NULL, 'Patrick Lewar', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data ketujuh
+    ('f6c7e9d8-8f45-4298-89b3-f24d6ffb741c', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'affiliateinda@gmail.com', '0000000007', NULL, 'Porserosi Kabupaten Malang', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data kedelapan
+    ('f6c7e9d8-8f45-4298-89b3-f24d6ffb741d', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'temanevent@gmail.com', '000000008', NULL, 'Teman Event', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data kesembilan
+    ('d6c7e9d8-8f45-4298-89b3-f24d6ffb742a', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'coachardhitkidsacademy@gmail.com', '0000000009', NULL, 'CA Kids Academy', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data kesepuluh
+    ('f6c7e9d8-8f45-4298-89b3-f24d6ffb743b', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'sudanppi@gmail.com', '0000000010', NULL, 'PPI Sudan (Persatuan Pelajar Indonesia Sudan)', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE),
+    
+    -- Data kesebelas
+    ('f6c7e9d8-8f45-4298-89b3-f24d6ffb7423', 'fa9c7b2f-3a64-4a16-b18a-dfe7b76b7577', 
+    '$argon2id$v=19$t=3,m=4096,p=1$0rCgoyIPWD/Zp6XA8875WQ$NOlvYm5rGH8uA6sic24wBg39CP0enXEqd2xlBVMl1us', 
+    'idzul.adhim@gmail.com', '000000011', NULL, 'UMKM Indonesia', NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, FALSE, TRUE);
+
+
 DROP TABLE IF EXISTS "user"."instansi_user" CASCADE;
 CREATE TABLE "user"."instansi_user"
 (
